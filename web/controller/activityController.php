@@ -56,6 +56,22 @@ class ActivityController extends BaseController
 
     public function updateActivity(Activity $activity)
     {
+        // check if there is a valid id
+        if ($activity->getId() == -1) {
+            $arr = $activity->toArray();
+            // strip the default id
+            unset($arr['id']);
+            // strip the idTrainingPlan if is -1
+            if ($arr['id_training_plan'] == -1) {
+                unset($arr['id_training_plan']);
+            }
+            throw new MissingParameterException(
+                $arr,
+                ['id' => 'a valid id(number)'],
+                'Activity'
+            );
+            throw new Exception("Activity plan does not have an ID", 422);
+        }
         $values = $this->toSqlArray($activity);
         $id = parent::update($values, $activity->getId());
         return $id;

@@ -139,6 +139,11 @@ class BaseController extends MySqlConnectionProvider
     // return true if the update was successful or false if an error occurred
     protected function update(array $values, int $id)
     {
+        // check if exist
+        if (!$this->exist($id)) {
+            throw new Exception("Not found", 404);
+        }
+
         // prepare the statement
         $query = "UPDATE " . $this->table . " SET ";
         // add all the values except the id
