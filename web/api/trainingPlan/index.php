@@ -5,8 +5,13 @@ require_once "../../controller/trainingPlanController.php";
 function sendResponse($response, $status = 200)
 {
     header("Content-Type: application/json");
-    // check whether the response is an Throwable object
-    if ($response instanceof Throwable) {
+    // if is a JsonSerializableException put the error code and the message as the response
+    if ($response instanceof JsonSerializableException) {
+        $status = $response->getCode();
+        $status = $status ? $status : 500;
+        $response = $response->jsonSerialize();
+    } else if ($response instanceof Throwable) {
+        // check whether the response is an Throwable object
         $status = $response->getCode();
         $response = [
             "Exception" => get_class($response),
@@ -51,6 +56,9 @@ try {
             throw new Exception("Invalid TrainingPlan object", 400);
         }
         $trainingPlan = TrainingPlan::fromArray($json);
+        // destroy the body of the request
+        unset($body);
+        unset($json);
     }
 
 
@@ -63,19 +71,17 @@ try {
         exit();
     } else if ($verb == "GET") {
         $result = $id == null ? $controller->getAll() : $controller->getById($id);
-        sendResponse($result);
     } else if ($verb == "POST") {
-        $result = $controller->insertTrainingPlan($body);
-        sendResponse($result);
+        $controller->insertTrainingPlan($trainingPlan);
+        $result = $trainingPlan;
     } else if ($verb == "PUT") {
-        $result = $controller->updateTrainingPlan($body);
-        sendResponse($result);
+        $result = $controller->updateTrainingPlan($trainingPlan);
     } else if ($verb == "DELETE") {
         $result = $controller->deleteTrainingPlan($id);
-        sendResponse($result);
     } else {
         throw new Exception("Method not allowed", 405);
     }
+    sendResponse($result);
 } catch (Throwable $e) {
     sendResponse($e);
 }

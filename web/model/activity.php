@@ -1,5 +1,6 @@
 <?php
 
+require_once('common.php');
 
 class Activity implements JsonSerializable
 {
@@ -141,9 +142,7 @@ class Activity implements JsonSerializable
 
     public function toArray(): array
     {
-        return [
-            'id' => $this->id,
-            'idTrainingPlan' => $this->idTrainingPlan,
+        $arr = [
             'day' => $this->day,
             'name' => $this->name,
             'repetitions' => $this->repetitions,
@@ -152,6 +151,13 @@ class Activity implements JsonSerializable
             'cadence' => $this->cadence,
             'weight' => $this->weight,
         ];
+        if ($this->id != -1) {
+            $arr['id'] = $this->id;
+        }
+        if ($this->idTrainingPlan != 1) {
+            $arr['idTrainingPlan'] = $this->idTrainingPlan;
+        }
+        return $arr;
     }
 
     public static function fromArray(array $arr): Activity
@@ -159,10 +165,10 @@ class Activity implements JsonSerializable
         // check if one of the required fields is missing
         $missing_params = array();
         if (!isset($arr['id'])) {
-            $missing_params[] = 'id';
+            $arr['id'] = -1;
         }
         if (!isset($arr['idTrainingPlan'])) {
-            $missing_params[] = 'idTrainingPlan';
+            $arr['idTrainingPlan'] = -1;
         }
         if (!isset($arr['day'])) {
             $missing_params[] = 'day';
@@ -186,11 +192,10 @@ class Activity implements JsonSerializable
             $missing_params[] = 'weight';
         }
         if (count($missing_params) > 0) {
-            throw new Exception(
-                'Missing required fields for Activity: ' . implode(', ', $missing_params) . "\n" .
-                    "body: " . json_encode($arr),
-                422
-            );
+            // get the type of this class (static method)
+            $class = get_called_class();
+            // throw exception
+            throw new MissingParameterException($arr, $missing_params, $class);
         }
 
         return new Activity(

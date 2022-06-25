@@ -1,6 +1,7 @@
 <?php
 // Activity class
 require_once('activity.php');
+require_once('common.php');
 
 class TrainingPlan implements JsonSerializable
 {
@@ -66,9 +67,7 @@ class TrainingPlan implements JsonSerializable
     {
         // check for required fields
         $missing_params = array();
-        if (!isset($arr['id'])) {
-            $missing_params[] = 'id';
-        }
+
         if (!isset($arr['username'])) {
             $missing_params[] = 'username';
         }
@@ -81,13 +80,14 @@ class TrainingPlan implements JsonSerializable
             if (isset($arr['activities'])) {
                 unset($arr['activities']);
             }
-            throw new Exception(
-                "Missing parameters for training plan: " . implode(', ', $missing_params) . "\n" .
-                    "body: " . json_encode($arr),
-                422
-            );
+            // get the type of this class (static method)
+            $class = get_called_class();
+            // throw exception
+            throw new MissingParameterException($arr, $missing_params, $class);
         }
-        $id = $arr['id'];
+        $id = isset($arr['id']) ? $arr['id'] : null;
+        // convert id to int (if null -1)
+        $id = $id == null ? -1 : intval($id);
         $username = $arr['username'];
         $name = $arr['name'];
         $activities = [];
@@ -103,24 +103,21 @@ class TrainingPlan implements JsonSerializable
 
     public function toArray(bool $recursive = true): array
     {
+        $params = array(
+            'username' => $this->username,
+            'name' => $this->name,
+        );
+        if ($this->id != -1) {
+            $params['id'] = $this->id;
+        }
         if ($recursive) {
             $activities = [];
             foreach ($this->activities as $activity) {
                 $activities[] = $activity->toArray();
             }
-            return [
-                'id' => $this->id,
-                'username' => $this->username,
-                'name' => $this->name,
-                'activities' => $activities,
-            ];
-        } else {
-            return [
-                'id' => $this->id,
-                'username' => $this->username,
-                'name' => $this->name,
-            ];
+            $params['activities'] = $activities;
         }
+        return $params;
     }
 
 
