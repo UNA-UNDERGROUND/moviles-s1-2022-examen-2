@@ -62,25 +62,47 @@ class TrainingPlan implements JsonSerializable
         $this->activities = $activities;
     }
 
-    public static function fromJson(array $json): TrainingPlan
+    public static function fromArray(array $arr): TrainingPlan
     {
-        $id = $json['id'];
-        $username = $json['username'];
-        $name = $json['name'];
+        $id = $arr['id'];
+        $username = $arr['username'];
+        $name = $arr['name'];
         $activities = [];
-        foreach ($json['activities'] as $activity) {
-            $activities[] = Activity::fromJson($activity);
+        // activities is an optional field
+        if (array_key_exists('activities', $arr)) {
+            foreach ($arr['activities'] as $activity) {
+                $activities[] = Activity::fromArray($activity);
+            }
         }
+
         return new TrainingPlan($id, $username, $name, $activities);
     }
 
+    public function toArray(bool $recursive = true): array
+    {
+        if ($recursive) {
+            $activities = [];
+            foreach ($this->activities as $activity) {
+                $activities[] = $activity->toArray();
+            }
+            return [
+                'id' => $this->id,
+                'username' => $this->username,
+                'name' => $this->name,
+                'activities' => $activities,
+            ];
+        } else {
+            return [
+                'id' => $this->id,
+                'username' => $this->username,
+                'name' => $this->name,
+            ];
+        }
+    }
+
+
     public function jsonSerialize(): mixed
     {
-        return [
-            'id' => $this->id,
-            'username' => $this->username,
-            'name' => $this->name,
-            'activities' => $this->activities,
-        ];
+        return $this->toArray();
     }
 };

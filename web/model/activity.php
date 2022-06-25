@@ -129,32 +129,43 @@ class Activity implements JsonSerializable
         $this->weight = $weight;
     }
 
+
+
     public function jsonSerialize(): mixed
     {
+        $rows = $this->toArray();
+        // remove idTrainingPlan
+        unset($rows['idTrainingPlan']);
+        return $rows;
+    }
+
+    public function toArray(): array
+    {
         return [
-            "id" => $this->id,
-            "day" => $this->day,
-            "name" => $this->name,
-            "repetitions" => $this->repetitions,
-            "breaks" => $this->breaks,
-            "series" => $this->series,
-            "cadence" => $this->cadence,
-            "weight" => $this->weight,
+            'id' => $this->id,
+            'idTrainingPlan' => $this->idTrainingPlan,
+            'day' => $this->day,
+            'name' => $this->name,
+            'repetitions' => $this->repetitions,
+            'breaks' => $this->breaks,
+            'series' => $this->series,
+            'cadence' => $this->cadence,
+            'weight' => $this->weight,
         ];
     }
 
-    public static function fromJson(array $json): Activity
+    public static function fromArray(array $arr): Activity
     {
         return new Activity(
-            $json["id"],
-            $json["idTrainingPlan"],
-            $json["day"],
-            $json["name"],
-            $json["repetitions"],
-            $json["breaks"],
-            $json["series"],
-            $json["cadence"],
-            $json["weight"]
+            $arr["id"],
+            $arr["idTrainingPlan"],
+            $arr["day"],
+            $arr["name"],
+            $arr["repetitions"],
+            $arr["breaks"],
+            $arr["series"],
+            $arr["cadence"],
+            $arr["weight"]
         );
     }
 };
