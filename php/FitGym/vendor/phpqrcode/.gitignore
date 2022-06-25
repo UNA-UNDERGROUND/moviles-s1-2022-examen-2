@@ -1,0 +1,3 @@
+cache/
+# do not track error logs
+*-errors.txt

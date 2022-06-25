@@ -1,0 +1,3 @@
+# ignorar la carpeta de vscode, los ajustes de depuracion son autogenerados
+.vscode
+*.pyc
