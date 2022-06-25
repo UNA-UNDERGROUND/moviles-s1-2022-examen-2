@@ -1,4 +1,0 @@
--- this script is run when the database is created        --
--- if the database already exists, this script is not run --
--- after this file is run each migration script is run    --
--- finally the data scripts are run                       --
