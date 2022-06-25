@@ -13,7 +13,7 @@ class ActivityController extends BaseController
 
     function __construct()
     {
-        parent::__construct("activity");
+        parent::__construct("training_plan_activity");
     }
 
     public function getAll(): array

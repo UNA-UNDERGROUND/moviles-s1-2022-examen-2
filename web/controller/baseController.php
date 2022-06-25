@@ -28,13 +28,10 @@ class BaseController extends MySqlConnectionProvider
             $stmt = $conn->prepare($sql);
             // close the statement
             $stmt->close();
-        }
-        // check if the exception was caused due to the table not existing
-        catch (Throwable $e) {
+        } catch (Throwable $e) {
+            // check if the exception was caused due to the table not existing
             if ($e->getCode() == 1146) {
                 throw new Exception("Table $this->table does not exist");
-            } else {
-                throw $e;
             }
         } finally {
             $conn->close();
@@ -103,25 +100,36 @@ class BaseController extends MySqlConnectionProvider
     // return the id of the inserted row or false if an error occurred
     protected function insert(array $values)
     {
-        // prepare the statement
-        $query = "INSERT INTO " . $this->table . " (" . implode(", ", array_keys($values)) . ") VALUES (" . implode(", ", array_map(function () {
-            return "?";
-        }, array_values($values))) . ")";
-        // prepare the statement
-        $conn = parent::getConnection();
-        $stmt = $conn->prepare($query);
-        // bind the values
-        $stmt->bind_param(str_repeat('s', count($values)), ...array_values($values));
-        // execute the statement
-        $stmt->execute();
-        // get the id of the inserted row
-        $id = $stmt->insert_id;
-        // close the statement
-        $stmt->close();
-        // close the connection
-        $conn->close();
-        // return the id or false if an error occurred
-        return $id;
+        try {
+            // prepare the statement
+            $query = "INSERT INTO " . $this->table . " (" . implode(", ", array_keys($values)) . ") VALUES (" . implode(", ", array_map(function () {
+                return "?";
+            }, array_values($values))) . ")";
+            // prepare the statement
+            $conn = parent::getConnection();
+            $stmt = $conn->prepare($query);
+            // bind the values
+            $stmt->bind_param(str_repeat('s', count($values)), ...array_values($values));
+            // execute the statement
+            $stmt->execute();
+            // get the id of the inserted row
+            $id = $stmt->insert_id;
+            // close the statement
+            $stmt->close();
+            // close the connection
+            $conn->close();
+            // return the id or false if an error occurred
+            return $id;
+        } catch (Throwable $e) {
+            // check if the exception was caused due to a duplicate entry
+            if ($e->getCode() == 1062) {
+                throw new Exception("Duplicate entry", 409);
+            } else {
+                throw $e;
+            }
+        } finally {
+            $conn->close();
+        }
     }
 
     // do a generic update based on the provided values
