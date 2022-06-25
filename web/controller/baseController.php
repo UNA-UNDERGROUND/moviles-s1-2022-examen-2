@@ -199,11 +199,13 @@ class BaseController extends MySqlConnectionProvider
         $stmt->bind_param('i', $id);
         // execute the statement
         $stmt->execute();
+        // get the number of rows affected
+        $affected_rows = $stmt->affected_rows;
         // close the statement
         $stmt->close();
         // close the connection
         $conn->close();
         // return true if the delete was successful or false if an error occurred
-        return $stmt->affected_rows > 0;
+        return $affected_rows > 0;
     }
 }

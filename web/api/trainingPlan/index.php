@@ -48,6 +48,11 @@ try {
     ) {
         if (isset($_GET['id'])) {
             $id = $_GET['id'];
+            // check is is a valid integer
+            if (!is_numeric($id)) {
+                throw new Exception("Id must be a number", 422);
+            }
+            $id = intval($id);
         }
     } else if (
         $verb == "POST" ||
@@ -83,7 +88,12 @@ try {
     } else if ($verb == "PUT") {
         $result = $controller->updateTrainingPlan($trainingPlan);
     } else if ($verb == "DELETE") {
-        $result = $controller->deleteTrainingPlan($id);
+        // check if there is a valid id
+        if ($id == null) {
+            throw new Exception("Missing Id", 409);
+        }
+        $trainingPlan = $controller->getById($id);
+        $result = $controller->deleteTrainingPlan($trainingPlan);
     } else {
         throw new Exception("Method not allowed", 405);
     }
