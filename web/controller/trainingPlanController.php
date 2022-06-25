@@ -1,11 +1,15 @@
 <?php
 
+$model_path = realpath(dirname(__FILE__) . '/../model');
+
 // baseController.php
 require_once "baseController.php";
+// activity controller
+require_once "activityController.php";
 // ActivityController
-require_once "../model/activity.php";
+require_once $model_path . "/activity.php";
 // TrainingPlan
-require_once "../model/trainingPlan.php";
+require_once $model_path . "/trainingPlan.php";
 
 class TrainingPlanController extends BaseController
 {
@@ -14,7 +18,7 @@ class TrainingPlanController extends BaseController
 
     function __construct()
     {
-        $activityController = new ActivityController();
+        $this->activityController = new ActivityController();
         parent::__construct("training_plan");
     }
 
@@ -33,7 +37,7 @@ class TrainingPlanController extends BaseController
     {
         $rows = parent::select(['id' => $id]);
         if (count($rows) == 0) {
-            throw new Exception("TrainingPlan not found");
+            throw new Exception("TrainingPlan not found", 404);
         }
         return $this->constructTrainingPlan($rows[0], $this->activityController);
     }

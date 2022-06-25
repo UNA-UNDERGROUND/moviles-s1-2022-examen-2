@@ -64,6 +64,29 @@ class TrainingPlan implements JsonSerializable
 
     public static function fromArray(array $arr): TrainingPlan
     {
+        // check for required fields
+        $missing_params = array();
+        if (!isset($arr['id'])) {
+            $missing_params[] = 'id';
+        }
+        if (!isset($arr['username'])) {
+            $missing_params[] = 'username';
+        }
+        if (!isset($arr['name'])) {
+            $missing_params[] = 'name';
+        }
+        // throw exception if required fields are missing
+        if (count($missing_params) > 0) {
+            // if activity exists remove it from the array
+            if (isset($arr['activities'])) {
+                unset($arr['activities']);
+            }
+            throw new Exception(
+                "Missing parameters for training plan: " . implode(', ', $missing_params) . "\n" .
+                    "body: " . json_encode($arr),
+                422
+            );
+        }
         $id = $arr['id'];
         $username = $arr['username'];
         $name = $arr['name'];

@@ -3,7 +3,7 @@
 $vendor_path = realpath(dirname(__FILE__) . '/../vendor');
 $dboilerplate_path = $vendor_path . '/una-ouroboros/DBoilerplate';
 
-require_once $dboilerplate_path . '/MySqlConnectionProvider.sql';
+require_once $dboilerplate_path . '/MySqlConnectionProvider.php';
 
 
 use una_ouroboros\DBoilerplate\MySqlConnectionProvider;
@@ -34,13 +34,12 @@ class BaseController extends MySqlConnectionProvider
     // return an array of the results
     protected function select(array $values)
     {
+        $with_values = $values != null &&
+            count($values) > 0;
         // prepare the statement
         $query = "SELECT * FROM " . $this->table;
         // check if values is empty or null
-        if (
-            $values != null &&
-            count($values) > 0
-        ) {
+        if ($with_values) {
             // add WHERE clause
             $query .= " WHERE ";
             // add the values like " username = ? AND password = ? "
@@ -52,7 +51,15 @@ class BaseController extends MySqlConnectionProvider
         $conn = parent::getConnection();
         $stmt = $conn->prepare($query);
         // bind the values
-        $stmt->bind_param(str_repeat('s', count($values)), ...array_values($values));
+        if ($with_values) {
+            $stmt->bind_param(
+                str_repeat(
+                    's',
+                    count($values)
+                ),
+                ...array_values($values)
+            );
+        }
         // execute the statement
         $stmt->execute();
         // get the results

@@ -1,10 +1,11 @@
 <?php
 
+$model_path = realpath(dirname(__FILE__) . '/../model');
 
 // baseController.php
 require_once "baseController.php";
 // Activity
-require_once "../model/activity.php";
+require_once $model_path . "/activity.php";
 
 
 class ActivityController extends BaseController
@@ -29,7 +30,7 @@ class ActivityController extends BaseController
     {
         $rows = parent::select(['id' => $id]);
         if (count($rows) == 0) {
-            throw new Exception("Activity not found");
+            throw new Exception("Activity not found", 404);
         }
         return $this->constructActivity($rows[0]);
     }

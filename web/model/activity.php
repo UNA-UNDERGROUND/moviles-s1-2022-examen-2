@@ -156,6 +156,43 @@ class Activity implements JsonSerializable
 
     public static function fromArray(array $arr): Activity
     {
+        // check if one of the required fields is missing
+        $missing_params = array();
+        if (!isset($arr['id'])) {
+            $missing_params[] = 'id';
+        }
+        if (!isset($arr['idTrainingPlan'])) {
+            $missing_params[] = 'idTrainingPlan';
+        }
+        if (!isset($arr['day'])) {
+            $missing_params[] = 'day';
+        }
+        if (!isset($arr['name'])) {
+            $missing_params[] = 'name';
+        }
+        if (!isset($arr['repetitions'])) {
+            $missing_params[] = 'repetitions';
+        }
+        if (!isset($arr['breaks'])) {
+            $missing_params[] = 'breaks';
+        }
+        if (!isset($arr['series'])) {
+            $missing_params[] = 'series';
+        }
+        if (!isset($arr['cadence'])) {
+            $missing_params[] = 'cadence';
+        }
+        if (!isset($arr['weight'])) {
+            $missing_params[] = 'weight';
+        }
+        if (count($missing_params) > 0) {
+            throw new Exception(
+                'Missing required fields for Activity: ' . implode(', ', $missing_params) . "\n" .
+                    "body: " . json_encode($arr),
+                422
+            );
+        }
+
         return new Activity(
             $arr["id"],
             $arr["idTrainingPlan"],
