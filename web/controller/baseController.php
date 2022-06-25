@@ -116,8 +116,6 @@ class BaseController extends MySqlConnectionProvider
             $id = $stmt->insert_id;
             // close the statement
             $stmt->close();
-            // close the connection
-            $conn->close();
             // return the id or false if an error occurred
             return $id;
         } catch (Throwable $e) {
