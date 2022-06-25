@@ -68,14 +68,32 @@ class TrainingPlanController extends BaseController
 
     public function updateTrainingPlan(TrainingPlan $trainingPlan)
     {
-        $values = $this->toSqlArray($trainingPlan);
-        $id = parent::update($values, $trainingPlan->getId());
-        // update activities
-        foreach ($trainingPlan->getActivities() as $activity) {
-            $activity->setIdTrainingPlan($trainingPlan->getId());
-            $this->activityController->updateActivity($activity);
+        // check if there is a valid id
+        if ($trainingPlan->getId() == -1) {
+            $arr = $trainingPlan->toArray();
+            // strip the default id
+            unset($arr['id']);
+            // if the activities is empty also remove it
+            if (count($trainingPlan->getActivities()) == 0) {
+                unset($arr['activities']);
+            }
+            throw new MissingParameterException(
+                $arr,
+                ['id' => 'a valid id(number)'],
+                'TrainingPlan'
+            );
+            throw new Exception("Training plan does not have an ID", 422);
         }
-        return $id;
+        $values = $this->toSqlArray($trainingPlan);
+        $modified = parent::update($values, $trainingPlan->getId());
+        if ($modified) {
+            // update activities
+            foreach ($trainingPlan->getActivities() as $activity) {
+                $activity->setIdTrainingPlan($trainingPlan->getId());
+                $this->activityController->updateActivity($activity);
+            }
+        }
+        return $modified;
     }
 
     public function deleteTrainingPlan(TrainingPlan $trainingPlan)

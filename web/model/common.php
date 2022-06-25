@@ -12,6 +12,10 @@ abstract class JsonSerializableException extends Exception implements JsonSerial
         $arr = $this->toArray();
         // add the message to the array
         $arr['message'] = $this->getMessage();
+        // check if there is a inner exception
+        if ($this->getPrevious()) {
+            $arr['innerException'] = $this->getPrevious()->getMessage();
+        }
         return $arr;
     }
 

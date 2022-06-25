@@ -140,26 +140,42 @@ class BaseController extends MySqlConnectionProvider
     protected function update(array $values, int $id)
     {
         // prepare the statement
-        $query = "UPDATE " . $this->table . " SET " . implode(", ", array_map(function ($key) {
-            return $key . " = ?";
-        }, array_keys($values))) . " WHERE id = ?";
+        $query = "UPDATE " . $this->table . " SET ";
+        // add all the values except the id
+        foreach (array_keys($values) as $key) {
+            if ($key != 'id') {
+                $query .= $key . " = ?, ";
+            }
+        }
+        // remove the last comma
+        $query = substr($query, 0, -2);
+        // add the WHERE clause
+        $query .= " WHERE id = ?";
         // prepare the statement
         $conn = parent::getConnection();
         $stmt = $conn->prepare($query);
-        // bind the values (iteratively)
-        foreach ($values as $value) {
-            $stmt->bind_param('s', $value);
+        // set all the values witout the id
+        $params = [];
+        foreach ($values as $key => $value) {
+            if ($key != 'id') {
+                $params[] = $value;
+            }
         }
-        // bind the id
-        $stmt->bind_param('i', $id);
+        // put the id at the end of the params
+        $params[] = $id;
+        // bind the values
+        $stmt->bind_param(str_repeat('s', count($params)), ...$params);
+
         // execute the statement
         $stmt->execute();
+        // get the number of rows affected
+        $affected_rows = $stmt->affected_rows;
         // close the statement
         $stmt->close();
         // close the connection
         $conn->close();
         // return true if the update was successful or false if an error occurred
-        return $stmt->affected_rows > 0;
+        return $affected_rows > 0;
     }
 
     // do a generic delete based on the provided id

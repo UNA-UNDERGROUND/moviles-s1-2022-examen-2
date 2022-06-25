@@ -13,11 +13,17 @@ function sendResponse($response, $status = 200)
     } else if ($response instanceof Throwable) {
         // check whether the response is an Throwable object
         $status = $response->getCode();
-        $response = [
+        $arr = [
             "Exception" => get_class($response),
-            "Message" => $response->getMessage(),
-            "InnerException" => $response->getPrevious() ? $response->getPrevious()->getMessage() : null,
+            "Message" => $response->getMessage()
         ];
+        // check if there is a inner exception
+        if ($response->getPrevious()) {
+            $arr['InnerException'] = $response->getPrevious()->getMessage();
+        }
+
+        $response = $arr;
+
         // set the http status code to the exception code, if not set, use 500
         $status = $status ? $status : 500;
     }
