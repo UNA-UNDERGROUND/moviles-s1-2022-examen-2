@@ -17,6 +17,28 @@ class BaseController extends MySqlConnectionProvider
     {
         parent::__construct("examen", "local");
         $this->table = $table;
+        $this->throwIfTableDoesNotExist();
+    }
+
+    private function throwIfTableDoesNotExist(): void
+    {
+        try {
+            $sql = "SELECT * FROM $this->table";
+            $conn = parent::getConnection();
+            $stmt = $conn->prepare($sql);
+            // close the statement
+            $stmt->close();
+        }
+        // check if the exception was caused due to the table not existing
+        catch (Throwable $e) {
+            if ($e->getCode() == 1146) {
+                throw new Exception("Table $this->table does not exist");
+            } else {
+                throw $e;
+            }
+        } finally {
+            $conn->close();
+        }
     }
 
     // generic exist based on id
