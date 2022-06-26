@@ -46,7 +46,7 @@ create table training_plan_activity
 
 alter table training_plan_activity
     add constraint training_plan_activity_fk
-        foreign key (id) references training_plan (id)
+        foreign key (id_training_plan) references training_plan (id)
             on delete cascade;
 
 -- unique constraints --
@@ -55,3 +55,8 @@ alter table training_plan_activity
 alter table training_plan
     add constraint training_plan_name_unique
         unique (username, name);
+
+-- the activity cannot have the same name per training plan --
+alter table training_plan_activity
+    add constraint training_plan_activity_name_unique
+        unique (id_training_plan, name);
