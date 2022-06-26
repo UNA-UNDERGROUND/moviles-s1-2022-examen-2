@@ -8,22 +8,22 @@ class Activity implements JsonSerializable
     private int $idTrainingPlan;
     private string $day;
     private string $name;
-    private string $repetitions;
-    private string $breaks;
-    private string $series;
-    private string $cadence;
-    private string $weight;
+    private int $repetitions;
+    private int $breaks;
+    private int $series;
+    private int $cadence;
+    private int $weight;
 
     public function __construct(
         int $id,
         int $idTrainingPlan,
         string $day,
         string $name,
-        string $repetitions,
-        string $breaks,
-        string $series,
-        string $cadence,
-        string $weight
+        int $repetitions,
+        int $breaks,
+        int $series,
+        int $cadence,
+        int $weight
     ) {
         $this->id = $id;
         $this->idTrainingPlan = $idTrainingPlan;
@@ -68,8 +68,7 @@ class Activity implements JsonSerializable
             $invalidFields[] = [
                 'field' => 'repetitions',
                 'message' => 'Repetitions must be greater than 0',
-                'value' => $this->repetitions,
-                'example values' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                'value' => $this->repetitions
             ];
         }
         // check if breaks is non negative
@@ -77,8 +76,7 @@ class Activity implements JsonSerializable
             $invalidFields[] = [
                 'field' => 'breaks',
                 'message' => 'Breaks must be non negative',
-                'value' => $this->breaks,
-                'example values' => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                'value' => $this->breaks
             ];
         }
         // check if series is non negative
@@ -86,8 +84,7 @@ class Activity implements JsonSerializable
             $invalidFields[] = [
                 'field' => 'series',
                 'message' => 'Series must be non negative',
-                'value' => $this->series,
-                'example values' => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                'value' => $this->series
             ];
         }
         // check if cadence is non negative
@@ -95,8 +92,7 @@ class Activity implements JsonSerializable
             $invalidFields[] = [
                 'field' => 'cadence',
                 'message' => 'Cadence must be non negative',
-                'value' => $this->cadence,
-                'example values' => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                'value' => $this->cadence
             ];
         }
         // check if weight is non negative
@@ -104,8 +100,7 @@ class Activity implements JsonSerializable
             $invalidFields[] = [
                 'field' => 'weight',
                 'message' => 'Weight must be non negative',
-                'value' => $this->weight,
-                'example values' => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                'value' => $this->weight
             ];
         }
         if (count($invalidFields) > 0) {
@@ -274,6 +269,24 @@ class Activity implements JsonSerializable
             // throw exception
             throw new MissingParameterException($arr, $missing_params, $class);
         }
+
+        // the following fields must be integers
+        // [repetitions, breaks, series, cadence, weight]
+        $int_params = array('repetitions', 'breaks', 'series', 'cadence', 'weight');
+        $invalidFields = array();
+        foreach ($int_params as $param) {
+            if (!is_int($arr[$param])) {
+                $invalidFields[] = [
+                    'field' => $param,
+                    'message' => "$param must be an integer",
+                    'value' => $arr[$param]
+                ];
+            }
+        }
+        if (count($invalidFields) > 0) {
+            throw new InvalidFieldsException($invalidFields, 'Activity');
+        }
+
 
         return new Activity(
             $arr["id"],
