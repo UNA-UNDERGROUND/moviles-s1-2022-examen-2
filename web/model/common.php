@@ -79,7 +79,7 @@ class InvalidFieldsException extends JsonSerializableException
             'Invalid fields for ' . $objectName,
             422
         );
-        $this->invalidParameters = $invalidFields;
+        $this->invalidFields= $invalidFields;
         $this->objectName = $objectName;
     }
 
