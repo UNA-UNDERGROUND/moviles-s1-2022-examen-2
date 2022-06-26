@@ -1,0 +1,14 @@
+
+RewriteEngine on
+
+# do not allow access to the following directories
+# [controller, model, vendor]
+RewriteRule ^(controller|model|vendor)/.*$ - [F]
+
+# rewrite /api/activity/{id} to /api/activity?id={id}
+RewriteRule ^api/activity/(\d+)$ api/activity?id=$1 [L]
+# rewrite /api/trainingPlan/{id} to /api/trainingPlan?id={id}
+RewriteRule ^api/trainingPlan/(\d+)$ api/trainingPlan?id=$1 [L]
+
+#RewriteRule ^/?Sapi/activity/([0-9]+)$ /api/activity/?id=$1
+#RewriteRule ^/?Sapi/trainingPlan/([0-9]+)$ /api/trainingPlan/?id=$1
