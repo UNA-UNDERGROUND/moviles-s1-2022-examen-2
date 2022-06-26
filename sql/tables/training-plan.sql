@@ -33,13 +33,13 @@ create table training_plan_activity
 );
 
 /*
-    Sunday/Lunes:   S
-    Monday/Martes:  M
-    Tuesday/Miercoles: T
-    Wednesday/Jueves: W
-    Thursday/Viernes: R
-    Friday/Sabado:  F
-    Saturday/Domingo: U
+    Sunday/Domingo:   S
+    Monday/Lunes:     M
+    Tuesday/Martes:   T
+    Wednesday/Miercoles: W
+    Thursday/Jueves:  R
+    Friday/Viernes:   F
+    Saturday/Sabado:  U
 */
 
 -- foreign keys constraints --
