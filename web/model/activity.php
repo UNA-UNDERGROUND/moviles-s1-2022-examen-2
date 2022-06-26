@@ -226,7 +226,7 @@ class Activity implements JsonSerializable
         if ($this->id != -1) {
             $arr['id'] = $this->id;
         }
-        if ($this->idTrainingPlan != 1) {
+        if ($this->idTrainingPlan != -1) {
             $arr['idTrainingPlan'] = $this->idTrainingPlan;
         }
         return $arr;
