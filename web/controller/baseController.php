@@ -122,7 +122,12 @@ class BaseController extends MySqlConnectionProvider
             // check if the exception was caused due to a duplicate entry
             if ($e->getCode() == 1062) {
                 throw new Exception("Duplicate entry", 409);
-            } else {
+            } 
+            // check if was caused due to a failing foreign key constraint
+            if ($e->getCode() == 1452) {
+                throw new Exception("required reference id not found", 409);
+            }
+            else {
                 throw $e;
             }
         } finally {
