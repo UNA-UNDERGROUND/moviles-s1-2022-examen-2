@@ -34,6 +34,83 @@ class Activity implements JsonSerializable
         $this->series = $series;
         $this->cadence = $cadence;
         $this->weight = $weight;
+        $this->validate();
+    }
+
+    // validate the object fields
+    private function validate()
+    {
+        $invalidFields = [];
+        // both id and idTrainingPlan are optional
+        // check if day is a valid day
+        // valid values are ['S', 'M', 'T', 'W', 'R', 'F', 'U']
+        // which correspond to:
+        // Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
+        if (!in_array($this->day, ['S', 'M', 'T', 'W', 'R', 'F', 'U'])) {
+            $invalidFields[] = [
+                'field' => 'day',
+                'message' => 'Invalid day type',
+                'value' => $this->day,
+                'expected' => ['S', 'M', 'T', 'W', 'R', 'F', 'U'],
+            ];
+        }
+        // check if name is not blank(empty or only whitespace)
+        if (isBlank($this->name)) {
+            $invalidFields[] = [
+                'field' => 'name',
+                'message' => 'Name cannot be blank',
+                'value' => $this->name,
+                'example values' => ['Push-up', 'Pull-up', 'Squat'],
+            ];
+        }
+        // check if repetitions is greater than 0
+        if ($this->repetitions <= 0) {
+            $invalidFields[] = [
+                'field' => 'repetitions',
+                'message' => 'Repetitions must be greater than 0',
+                'value' => $this->repetitions,
+                'example values' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ];
+        }
+        // check if breaks is non negative
+        if ($this->breaks < 0) {
+            $invalidFields[] = [
+                'field' => 'breaks',
+                'message' => 'Breaks must be non negative',
+                'value' => $this->breaks,
+                'example values' => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ];
+        }
+        // check if series is non negative
+        if ($this->series < 0) {
+            $invalidFields[] = [
+                'field' => 'series',
+                'message' => 'Series must be non negative',
+                'value' => $this->series,
+                'example values' => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ];
+        }
+        // check if cadence is non negative
+        if ($this->cadence < 0) {
+            $invalidFields[] = [
+                'field' => 'cadence',
+                'message' => 'Cadence must be non negative',
+                'value' => $this->cadence,
+                'example values' => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ];
+        }
+        // check if weight is non negative
+        if ($this->weight < 0) {
+            $invalidFields[] = [
+                'field' => 'weight',
+                'message' => 'Weight must be non negative',
+                'value' => $this->weight,
+                'example values' => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ];
+        }
+        if (count($invalidFields) > 0) {
+            throw new InvalidFieldsException($invalidFields, 'Activity');
+        }
     }
 
     // getters

@@ -66,3 +66,52 @@ class MissingParameterException extends JsonSerializableException
         ];
     }
 }
+
+class InvalidFieldsException extends JsonSerializableException
+{
+    private array $invalidFields;
+    private string $objectName;
+    public function __construct(
+        array $invalidFields,
+        string $objectName,
+    ) {
+        parent::__construct(
+            'Invalid fields for ' . $objectName,
+            422
+        );
+        $this->invalidParameters = $invalidFields;
+        $this->objectName = $objectName;
+    }
+
+    public function getInvalidFields(): array
+    {
+        return $this->invalidFields;
+    }
+
+    public function getObjectName(): string
+    {
+        return $this->objectName;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'invalidFields' => $this->getInvalidFields(),
+            'objectName' => $this->getObjectName(),
+        ];
+    }
+}
+
+// check whether a string is empty or only have non visible characters
+function isBlank(string $str): bool
+{
+    // check if the string is empty
+    if (strlen($str) == 0) {
+        return true;
+    }
+    // check if the string is only whitespace
+    if (ctype_space($str)) {
+        return true;
+    }
+    return false;
+}
