@@ -29,6 +29,27 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    flavorDimensions 'api'
+    productFlavors {
+        
+        local {
+            dimension 'api'
+            var apiFQDN = "0.0.0.0"
+            if(System.getenv("API_LOCAL_EXAMEN_FQDN") != null) {
+                apiFQDN = System.getenv("API_EXAMEN_FQDN")
+            }
+            buildConfigField('API_EXAMEN_FQDN', 'String', apiFQDN)
+        }
+        prod {
+            dimension 'api'
+            var apiFQDN = "0.0.0.0"
+            if(System.getenv("API_PROD_EXAMEN_FQDN") != null) {
+                apiFQDN = System.getenv("API_PROD_EXAMEN_FQDN")
+            }
+            buildConfigField('API_EXAMEN_FQDN', 'String', apiFQDN)
+        }
+    }
 }
 
 dependencies {
