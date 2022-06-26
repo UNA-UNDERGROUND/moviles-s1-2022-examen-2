@@ -103,8 +103,17 @@ class ActivityController extends BaseController
     private function toSqlArray(Activity $activity): array
     {
         $arr = $activity->toArray();
-        // rename idTrainingPlan to id_training_plan
-        $arr['id_training_plan'] = $arr['idTrainingPlan'];
+        // check if idTrainingPlan is set
+        if (isset($arr['idTrainingPlan'])) {
+            $arr['id_training_plan'] = $arr['idTrainingPlan'];
+            unset($arr['idTrainingPlan']);
+        } else {
+            throw new MissingParameterException(
+                $arr,
+                ['idTrainingPlan' => 'a valid id(number)'],
+                'Activity'
+            );
+        }
         // remove idTrainingPlan
         unset($arr['idTrainingPlan']);
         // return the array
