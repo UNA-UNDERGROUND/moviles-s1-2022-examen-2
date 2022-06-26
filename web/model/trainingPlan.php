@@ -17,6 +17,31 @@ class TrainingPlan implements JsonSerializable
         $this->username = $username;
         $this->name = $name;
         $this->activities = $activities;
+        $this->validate();
+    }
+
+    private function validate()
+    {
+        $invalidFields = [];
+        if (isBlank($this->username)) {
+            $invalidFields[] = [
+                'field' => 'username',
+                'message' => 'Username is required',
+                'value' => $this->username,
+                'examples' => ['username1', 'username2'],
+            ];
+        }
+        if (isBlank($this->name)) {
+            $invalidFields[] = [
+                'field' => 'name',
+                'message' => 'Name is required',
+                'value' => $this->name,
+                'examples' => ['Training plan 1', 'Training plan 2'],
+            ];
+        }
+        if (count($invalidFields) > 0) {
+            throw new InvalidFieldsException($invalidFields, 'TrainingPlan');
+        }
     }
 
     // getters
