@@ -124,11 +124,10 @@ class AddTrainingPlanActivity : AppCompatActivity() {
         if (editMode) {
             trainingPlan?.name = name
             trainingPlan?.username = username
-            TrainingPlanController.updateTrainingPlan(
+            TrainingPlanController.addTrainingPlan(
                 trainingPlan!!,
-                {
-                    runOnUiThread(
-                        Runnable {
+                { trainingPlan, code ->
+                    runOnUiThread{
                             Toast.makeText(
                                 this@AddTrainingPlanActivity,
                                 "Training plan updated",
@@ -136,18 +135,17 @@ class AddTrainingPlanActivity : AppCompatActivity() {
                             ).show()
                             refreshData()
                         }
-                    )
                 },
-                { error ->
-                    runOnUiThread(
-                        Runnable {
+                { error, code ->
+                    runOnUiThread{
                             Toast.makeText(
                                 this@AddTrainingPlanActivity,
                                 "Error updating training plan",
                                 Toast.LENGTH_SHORT
                             ).show()
+                            // unset the training plan to edit
+                            trainingPlan = null
                         }
-                    )
                 }
             )
         } else {
@@ -212,7 +210,7 @@ class AddTrainingPlanActivity : AppCompatActivity() {
                     Runnable {
                         Toast.makeText(
                             this@AddTrainingPlanActivity,
-                            "Error updating training plan",
+                            "Error updating training plan: $error",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -232,15 +230,19 @@ class AddTrainingPlanActivity : AppCompatActivity() {
             Toast.makeText(this, "Plan name is empty", Toast.LENGTH_LONG).show()
             return
         } else {
-            // check if the plan name is not already in the list
-            for (plan in planList) {
-                if (plan.name == name) {
-                    editPlan(name, plan)
+            if(trainingPlan != null) {
+                // if the plan is being edited, edit the plan
+                editPlan(name, trainingPlan!!)
+            } else {
+                // if the plan is being added, check if the plan name is not already in the list
+                if (planList.any { it.name == name }) {
+                    Toast.makeText(this, "Plan name already exists", Toast.LENGTH_LONG).show()
                     return
+                } else {
+                    // if the plan name is not in the list, add the plan
+                    addPlan(name, username)
                 }
             }
-            // if the plan name is not in the list, add it
-            addPlan(name, username)
         }
     }
 
