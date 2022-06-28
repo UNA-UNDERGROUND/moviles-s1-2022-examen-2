@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">examen2</string>
+    <string name="btn_edit">edit</string>
+    <string name="btn_add">add</string>
 </resources>

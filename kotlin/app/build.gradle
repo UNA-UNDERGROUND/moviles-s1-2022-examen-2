@@ -32,22 +32,22 @@ android {
 
     flavorDimensions 'api'
     productFlavors {
-        
+
         local {
             dimension 'api'
-            var apiFQDN = "0.0.0.0"
-            if(System.getenv("API_LOCAL_EXAMEN_FQDN") != null) {
-                apiFQDN = System.getenv("API_EXAMEN_FQDN")
+            var apiFQDN = "https://0.0.0.0"
+            if (System.getenv("API_LOCAL_EXAMEN_FQDN") != null) {
+                apiFQDN = "http://" + System.getenv("API_LOCAL_EXAMEN_FQDN")
             }
-            buildConfigField('API_EXAMEN_FQDN', 'String', apiFQDN)
+            buildConfigField('String', 'API_EXAMEN_FQDN', "\"" + apiFQDN + "\"")
         }
         prod {
             dimension 'api'
-            var apiFQDN = "0.0.0.0"
-            if(System.getenv("API_PROD_EXAMEN_FQDN") != null) {
-                apiFQDN = System.getenv("API_PROD_EXAMEN_FQDN")
+            var apiFQDN = "https://0.0.0.0"
+            if (System.getenv("API_PROD_EXAMEN_FQDN") != null) {
+                apiFQDN = "https://" + System.getenv("API_PROD_EXAMEN_FQDN")
             }
-            buildConfigField('API_EXAMEN_FQDN', 'String', apiFQDN)
+            buildConfigField('String', 'API_EXAMEN_FQDN', "\"" + apiFQDN + "\"")
         }
     }
 }
@@ -61,6 +61,6 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    // gson
-    implementation 'com.google.code.gson:gson:2.8.6'
+    // ok http
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
 }

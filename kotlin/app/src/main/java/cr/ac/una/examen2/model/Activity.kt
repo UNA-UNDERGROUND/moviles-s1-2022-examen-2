@@ -41,14 +41,14 @@ class Activity {
 
     // enum class for day
     // standing a id code and a char code
-    enum class Day(var id: Int, var char: Char) {
-        MONDAY(1, 'S'),
-        TUESDAY(2, 'T'),
-        WEDNESDAY(3, 'W'),
-        THURSDAY(4, 'R'),
-        FRIDAY(5, 'F'),
-        SATURDAY(6, 'S'),
-        SUNDAY(7, 'U');
+    enum class Day(var id: Int, var char: Char, var dayName: String) {
+        MONDAY(1, 'M', "Monday"),
+        TUESDAY(2, 'T', "Tuesday"),
+        WEDNESDAY(3, 'W', "Wednesday"),
+        THURSDAY(4, 'R', "Thursday"),
+        FRIDAY(5, 'F', "Friday"),
+        SATURDAY(6, 'S', "Saturday"),
+        SUNDAY(7, 'U', "Sunday");
 
         companion object {
             fun getDayById(id: Int): Day {
@@ -60,15 +60,27 @@ class Activity {
                 // if not throw exception
                 throw IllegalArgumentException("Invalid day id: $id")
             }
+
             fun getDayByChar(char: String): Day {
-                val dayChr = char.uppercase(Locale.ROOT)[0].toString()[0]
                 for (day in values()) {
-                    if (day.char == dayChr) {
+                    val dayStr = day.char.toString()
+                    if (dayStr.equals(char)) {
                         return day
                     }
                 }
                 // if not throw exception
                 throw IllegalArgumentException("Invalid day char: $char")
+            }
+
+            fun getDayByName(dayName: String): Day {
+                for (day in values()) {
+                    // compare each value to lowercase the name
+                    if (day.dayName.lowercase() == dayName.lowercase()) {
+                        return day
+                    }
+                }
+                // if not throw exception
+                throw IllegalArgumentException("Invalid day name: $dayName")
             }
         }
     }

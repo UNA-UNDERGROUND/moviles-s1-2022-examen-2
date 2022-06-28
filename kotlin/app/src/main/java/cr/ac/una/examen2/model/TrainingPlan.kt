@@ -48,7 +48,7 @@ class TrainingPlan {
         }
     }
 
-    private fun toJSON(): JSONObject {
+    fun toJSON(): JSONObject {
         val jsonObject = JSONObject()
         if (id != null) {
             jsonObject.put("id", id)
