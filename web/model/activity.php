@@ -208,7 +208,7 @@ class Activity implements JsonSerializable
     {
         $rows = $this->toArray();
         // remove idTrainingPlan
-        unset($rows['idTrainingPlan']);
+        // unset($rows['idTrainingPlan']);
         return $rows;
     }
 
