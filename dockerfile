@@ -3,6 +3,10 @@
 FROM php:8.0-apache
 WORKDIR /var/www/html
 
+
+# listen in heroku port for apache ports config
+RUN sed -i "s/Listen 80/Listen $PORT/g" /etc/apache2/ports.conf
+
 # copy all the files inside web/ to the container
 COPY web/ /var/www/html/
 
