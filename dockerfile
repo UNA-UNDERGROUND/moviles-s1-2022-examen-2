@@ -11,12 +11,17 @@ COPY docker/init-dboilerplate.py /init-dboilerplate.py
 # and make it executable by the web user
 RUN chmod -R 775 /init-dboilerplate.py
 
+## Heroku
 # copy the apache-heroku.py script to the container
 COPY docker/apache-heroku.py /apache-heroku.py
 # and make it executable by the web user
 RUN chmod -R 775 /apache-heroku.py
 # run the python script with python3
 RUN python3 /apache-heroku.py
+# Copy the run-apache2.sh script to the container
+COPY docker/run-apache2.sh /run-apache2.sh
+
+## General
 
 # copy all the files inside web/ to the container
 COPY web/ /var/www/html/
@@ -40,6 +45,8 @@ RUN useradd -s /bin/bash -m -d /var/www/html/app -g www-data app
 RUN echo "app:app" | chpasswd
 # change to the non root user
 USER app
+
+CMD [ "run-apache2.sh" ]
 
 
 EXPOSE 80
