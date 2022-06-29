@@ -37,7 +37,8 @@ COPY docker/config.toml /config/DBoilerplate.toml
 # and make it readable by the web user
 RUN chmod -R 775 /config
 
-
+## plugins 
+RUN docker-php-ext-install mysqli
 RUN a2enmod rewrite
 RUN service apache2 restart
 
