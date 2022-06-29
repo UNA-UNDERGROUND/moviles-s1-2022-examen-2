@@ -25,6 +25,9 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
+      # list directory of the current directory
+      - run: ls -la
+
       - name: Heroku Docker Container Deploy
         # You may pin to the exact commit or the version.
         # uses: lucassarcanjo/heroku-deploy@1db4c62f6032efe526c12734f18d36669218e5af
@@ -38,6 +41,7 @@ jobs:
           api_key: ${{ secrets.HEROKU_API_KEY }}
           # Your Heroku App Name
           app_name: ${{ secrets.HEROKU_APP_NAME }}
+
           # Dokerfile path
           dockerfile_path: dockerfile
           # Optional build parameters
