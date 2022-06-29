@@ -16,7 +16,7 @@ class MySqlConnectionProvider extends DBCredentialProvider
 
     protected function getConnection()
     {
-        $conn = mysqli_connect($this->host, $this->user, $this->pass, $this->base);
+        $conn = new \mysqli($this->host, $this->user, $this->pass, $this->base);
         $conn->set_charset('utf8');
         return $conn;
     }
