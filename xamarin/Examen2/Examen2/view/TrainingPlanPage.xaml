@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Examen2.view.TrainingPlanPage">
+    <ContentPage.Content>
+        <StackLayout>
+            <Frame BackgroundColor="#2196F3" Padding="24" CornerRadius="0">
+                <Label x:Name="title" Text="Training Plans" HorizontalTextAlignment="Center" TextColor="White" FontSize="36"/>
+            </Frame>
+            <!-- original name -->
+            <Grid IsVisible="False">
+                <Label Grid.Column="0"
+                   Text="Original Name"
+                   VerticalOptions="Center"/>
+                <Entry Grid.Column="1"
+                   IsEnabled="False"
+                   x:Name="txtOriginalName"/>
+            </Grid>
+            <!-- input -->
+            <StackLayout>
+                <StackLayout Orientation="Horizontal">
+                    <Label VerticalTextAlignment="Center">name</Label>
+                    <Entry x:Name="trainingPlanName"
+                       HorizontalOptions="FillAndExpand"/>
+                </StackLayout>
+            </StackLayout>
+            <!-- buttons -->
+            <StackLayout Orientation="Horizontal"
+                     HorizontalOptions="FillAndExpand">
+                <Button Text="Add"
+                    HorizontalOptions="FillAndExpand"
+                    Clicked="BtnAddClicked"
+                    />
+                <Button IsVisible="false"
+                    HorizontalOptions="FillAndExpand"
+                    Text="Cancel"
+                    Clicked="BtnCancelClicked"/>
+            </StackLayout>
+            <!-- items -->
+            <ScrollView>
+                <StackLayout x:Name="items">
+                    <SwipeView>
+                        <SwipeView.LeftItems>
+                            <SwipeItems>
+                                <SwipeItem Text="Edit"
+                           IconImageSource="Edit.png"
+                           BackgroundColor="LightGreen"
+                           Invoked="OnEditSwipeItemInvoked"/>
+                                <SwipeItem Text="Delete"
+                           IconImageSource="Delete.png"
+                           BackgroundColor="LightPink"
+                           Invoked="OnDeleteSwipeItemInvoked"/>
+                            </SwipeItems>
+                        </SwipeView.LeftItems>
+                        <!-- Content -->
+                        <Grid HeightRequest="60"
+                  WidthRequest="300"
+                  BackgroundColor="LightGray">
+                            <Label Text="Swipe Right"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+                        </Grid>
+                    </SwipeView>
+                </StackLayout>
+            </ScrollView>
+        </StackLayout>
+
+    </ContentPage.Content>
+</ContentPage>

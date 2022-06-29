@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:view="clr-namespace:Examen2.view"
+             x:Class="Examen2.view.LoginPage">
+    <ContentPage.Content>
+        <StackLayout>
+            <Frame BackgroundColor="#2196F3" Padding="24" CornerRadius="0">
+                <Label Text="Log In" HorizontalTextAlignment="Center" TextColor="White" FontSize="36"/>
+            </Frame>
+            <StackLayout VerticalOptions="Center">
+                <StackLayout Orientation="Horizontal" VerticalOptions="Center">
+                    <Label VerticalOptions="Center">User:</Label>
+                    <Entry x:Name="txtName"
+                       HorizontalOptions="FillAndExpand"/>
+                </StackLayout>
+                <Button VerticalOptions="Center" Clicked="btnLoginClicked" 
+                    Text="Login"/>
+            </StackLayout>
+            
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

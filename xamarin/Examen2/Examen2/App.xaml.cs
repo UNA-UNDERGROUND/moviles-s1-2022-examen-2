@@ -10,7 +10,7 @@ namespace Examen2
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            MainPage = new view.LoginPage();
         }
 
         protected override void OnStart()
