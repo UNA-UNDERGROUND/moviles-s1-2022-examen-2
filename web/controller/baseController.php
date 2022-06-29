@@ -27,6 +27,16 @@ class BaseController extends MySqlConnectionProvider
             $sql = "SELECT * FROM $this->table";
             $conn = parent::getConnection();
             $stmt = $conn->prepare($sql);
+            if (!$stmt) {
+                // get the error of the statement
+                $error = $conn->error;
+                // check if was caused by a table not existing
+                if (strpos($error, "doesn't exist") !== false) {
+                    throw new Exception("Table $this->table does not exist", 404);
+                } else {
+                    throw new Exception("Error while preparing statement: $error", 500);
+                }
+            }
             // close the statement
             $stmt->close();
         } catch (Throwable $e) {
@@ -35,7 +45,7 @@ class BaseController extends MySqlConnectionProvider
                 throw new Exception("Table $this->table does not exist");
             }
         } finally {
-            if($conn != null) {
+            if ($conn != null) {
                 $conn->close();
             }
         }
@@ -56,44 +66,63 @@ class BaseController extends MySqlConnectionProvider
     // return an array of the results
     protected function select(array $values)
     {
-        $with_values = $values != null &&
-            count($values) > 0;
-        // prepare the statement
-        $query = "SELECT * FROM " . $this->table;
-        // check if values is empty or null
-        if ($with_values) {
-            // add WHERE clause
-            $query .= " WHERE ";
-            // add the values like " username = ? AND password = ? "
-            $query .= implode(" AND ", array_map(function ($key) {
-                return $key . " = ?";
-            }, array_keys($values)));
-        }
-        // prepare the statement
-        $conn = parent::getConnection();
-        $stmt = $conn->prepare($query);
-        // bind the values
-        if ($with_values) {
-            $stmt->bind_param(
-                str_repeat(
-                    's',
-                    count($values)
-                ),
-                ...array_values($values)
+        $conn = null;
+        $stmt = null;
+        try {
+            $with_values = $values != null &&
+                count($values) > 0;
+            // prepare the statement
+            $query = "SELECT * FROM " . $this->table;
+            // check if values is empty or null
+            if ($with_values) {
+                // add WHERE clause
+                $query .= " WHERE ";
+                // add the values like " username = ? AND password = ? "
+                $query .= implode(" AND ", array_map(function ($key) {
+                    return $key . " = ?";
+                }, array_keys($values)));
+            }
+            // prepare the statement
+            $conn = parent::getConnection();
+            $stmt = $conn->prepare($query);
+            if (!$stmt) {
+                // get the error of the statement
+                throw new Exception("Error preparing statement: " . $conn->error);
+            }
+            // bind the values
+            if ($with_values) {
+                $stmt->bind_param(
+                    str_repeat(
+                        's',
+                        count($values)
+                    ),
+                    ...array_values($values)
+                );
+            }
+            // execute the statement
+            $stmt->execute();
+            // get the results
+            $result = $stmt->get_result();
+            // fetch the results
+            $results = $result->fetch_all(MYSQLI_ASSOC);
+
+            return $results;
+        } catch (\Throwable $th) {
+            // rethrow with this function name
+            throw new Exception(
+                "Error in " . __FUNCTION__ . ": " . $th->getMessage(),
+                $th->getCode(),
+                $th
             );
+            //throw $th;
+        } finally {
+            if ($stmt != null) {
+                $stmt->close();
+            }
+            if ($conn != null) {
+                $conn->close();
+            }
         }
-        // execute the statement
-        $stmt->execute();
-        // get the results
-        $result = $stmt->get_result();
-        // fetch the results
-        $results = $result->fetch_all(MYSQLI_ASSOC);
-        // close the statement
-        $stmt->close();
-        // close the connection
-        $conn->close();
-        // return the results
-        return $results;
     }
 
     // do a generic insert based on the provided values
@@ -103,6 +132,7 @@ class BaseController extends MySqlConnectionProvider
     // return the id of the inserted row or false if an error occurred
     protected function insert(array $values)
     {
+        $conn = null;
         try {
             // prepare the statement
             $query = "INSERT INTO " . $this->table . " (" . implode(", ", array_keys($values)) . ") VALUES (" . implode(", ", array_map(function () {
@@ -111,6 +141,10 @@ class BaseController extends MySqlConnectionProvider
             // prepare the statement
             $conn = parent::getConnection();
             $stmt = $conn->prepare($query);
+            if (!$stmt) {
+                // get the error of the statement
+                throw new Exception("Error preparing statement: " . $conn->error);
+            }
             // bind the values
             $stmt->bind_param(str_repeat('s', count($values)), ...array_values($values));
             // execute the statement
@@ -125,16 +159,17 @@ class BaseController extends MySqlConnectionProvider
             // check if the exception was caused due to a duplicate entry
             if ($e->getCode() == 1062) {
                 throw new Exception("Duplicate entry", 409);
-            } 
+            }
             // check if was caused due to a failing foreign key constraint
             if ($e->getCode() == 1452) {
                 throw new Exception("required reference id not found", 409);
-            }
-            else {
+            } else {
                 throw $e;
             }
         } finally {
-            $conn->close();
+            if ($conn != null) {
+                $conn->close();
+            }
         }
     }
 
@@ -145,48 +180,66 @@ class BaseController extends MySqlConnectionProvider
     // return true if the update was successful or false if an error occurred
     protected function update(array $values, int $id)
     {
-        // check if exist
-        if (!$this->exist($id)) {
-            throw new Exception("Not found", 404);
-        }
+        $conn = null;
+        $stmt = null;
+        try {
+            // check if exist
+            if (!$this->exist($id)) {
+                throw new Exception("Not found", 404);
+            }
 
-        // prepare the statement
-        $query = "UPDATE " . $this->table . " SET ";
-        // add all the values except the id
-        foreach (array_keys($values) as $key) {
-            if ($key != 'id') {
-                $query .= $key . " = ?, ";
+            // prepare the statement
+            $query = "UPDATE " . $this->table . " SET ";
+            // add all the values except the id
+            foreach (array_keys($values) as $key) {
+                if ($key != 'id') {
+                    $query .= $key . " = ?, ";
+                }
+            }
+            // remove the last comma
+            $query = substr($query, 0, -2);
+            // add the WHERE clause
+            $query .= " WHERE id = ?";
+            // prepare the statement
+            $conn = parent::getConnection();
+            $stmt = $conn->prepare($query);
+            if (!$stmt) {
+                // get the error of the statement
+                throw new Exception("Error preparing statement: " . $conn->error);
+            }
+            // set all the values witout the id
+            $params = [];
+            foreach ($values as $key => $value) {
+                if ($key != 'id') {
+                    $params[] = $value;
+                }
+            }
+            // put the id at the end of the params
+            $params[] = $id;
+            // bind the values
+            $stmt->bind_param(str_repeat('s', count($params)), ...$params);
+
+            // execute the statement
+            $stmt->execute();
+            // get the number of rows affected
+            $affected_rows = $stmt->affected_rows;
+            // return true if the update was successful or false if an error occurred
+            return $affected_rows > 0;
+        } catch (Throwable $e) {
+            // retrow with this function name
+            throw new Exception(
+                "Error in " . __FUNCTION__ . ": " . $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        } finally {
+            if ($stmt != null) {
+                $stmt->close();
+            }
+            if ($conn != null) {
+                $conn->close();
             }
         }
-        // remove the last comma
-        $query = substr($query, 0, -2);
-        // add the WHERE clause
-        $query .= " WHERE id = ?";
-        // prepare the statement
-        $conn = parent::getConnection();
-        $stmt = $conn->prepare($query);
-        // set all the values witout the id
-        $params = [];
-        foreach ($values as $key => $value) {
-            if ($key != 'id') {
-                $params[] = $value;
-            }
-        }
-        // put the id at the end of the params
-        $params[] = $id;
-        // bind the values
-        $stmt->bind_param(str_repeat('s', count($params)), ...$params);
-
-        // execute the statement
-        $stmt->execute();
-        // get the number of rows affected
-        $affected_rows = $stmt->affected_rows;
-        // close the statement
-        $stmt->close();
-        // close the connection
-        $conn->close();
-        // return true if the update was successful or false if an error occurred
-        return $affected_rows > 0;
     }
 
     // do a generic delete based on the provided id
@@ -196,22 +249,40 @@ class BaseController extends MySqlConnectionProvider
     // return true if the delete was successful or false if an error occurred
     protected function delete(int $id)
     {
-        // prepare the statement
-        $query = "DELETE FROM " . $this->table . " WHERE id = ?";
-        // prepare the statement
-        $conn = parent::getConnection();
-        $stmt = $conn->prepare($query);
-        // bind the values
-        $stmt->bind_param('i', $id);
-        // execute the statement
-        $stmt->execute();
-        // get the number of rows affected
-        $affected_rows = $stmt->affected_rows;
-        // close the statement
-        $stmt->close();
-        // close the connection
-        $conn->close();
-        // return true if the delete was successful or false if an error occurred
-        return $affected_rows > 0;
+        $conn = null;
+        $stmt = null;
+        try {
+            // prepare the statement
+            $query = "DELETE FROM " . $this->table . " WHERE id = ?";
+            // prepare the statement
+            $conn = parent::getConnection();
+            $stmt = $conn->prepare($query);
+            if (!$stmt) {
+                // get the error of the statement
+                throw new Exception("Error preparing statement: " . $conn->error);
+            }
+            // bind the values
+            $stmt->bind_param('i', $id);
+            // execute the statement
+            $stmt->execute();
+            // get the number of rows affected
+            $affected_rows = $stmt->affected_rows;
+            // return true if the delete was successful or false if an error occurred
+            return $affected_rows > 0;
+        } catch (Throwable $e) {
+            // retrow with this function name
+            throw new Exception(
+                "Error in " . __FUNCTION__ . ": " . $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        } finally {
+            if ($stmt != null) {
+                $stmt->close();
+            }
+            if ($conn != null) {
+                $conn->close();
+            }
+        }
     }
 }
