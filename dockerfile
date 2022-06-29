@@ -20,6 +20,8 @@ RUN chmod -R 775 /apache-heroku.py
 RUN python3 /apache-heroku.py
 # Copy the run-apache2.sh script to the container
 COPY docker/run-apache2.sh /run-apache2.sh
+# and make it executable by the web user
+RUN chmod -R 775 /run-apache2.sh
 
 ## General
 
@@ -46,7 +48,8 @@ RUN echo "app:app" | chpasswd
 # change to the non root user
 USER app
 
-CMD [ "run-apache2.sh" ]
+# set it to entry command
+CMD [ "/run-apache2.sh" ]
 
 
 EXPOSE 80
