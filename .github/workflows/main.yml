@@ -39,7 +39,7 @@ jobs:
           # Dockerfile directory.
           dockerfile_directory: ./ 
           # Dockerfile name. [default=Dockerfile]
-          #dockerfile_name: # optional, default is Dockerfile
+          dockerfile_name: dockerfile # optional, default is Dockerfile
           # Additional options of docker build command
           #docker_options: # optional, default is 
           # Select process type for wich you want docker container to be uploaded. [default=web]
