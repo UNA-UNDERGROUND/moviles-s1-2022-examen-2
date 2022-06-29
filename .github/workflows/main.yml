@@ -43,6 +43,6 @@ jobs:
           app_name: ${{ secrets.HEROKU_APP_NAME }}
 
           # Dokerfile path
-          dockerfile_path: dockerfile
+          dockerfile_path: .
           # Optional build parameters
           # options: # optional
