@@ -45,6 +45,9 @@ RUN service apache2 restart
 # create a non root user
 RUN useradd -s /bin/bash -m -d /var/www/html/app -g www-data app
 RUN echo "app:app" | chpasswd
+# set /etc/apache2/ports.conf editable by the web user
+RUN chmod -R 775 /etc/apache2/ports.conf
+
 # change to the non root user
 USER app
 
