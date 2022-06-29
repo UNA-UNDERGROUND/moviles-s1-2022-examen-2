@@ -42,11 +42,21 @@ class DBCredentialProvider
             $this->base = $base_env;
             return;
         }
+        
         // no puede estar dentro de una carpeta accesible por el servidor web
         $base_path = Platform::getConfigDir();
         $toml_path = "{$base_path}/{$app}";
         $toml_name = "{$database}.toml";
         $full_path = "{$toml_path}/{$toml_name}";
+
+        // check for environment variable DOCKER_DISABLE_DBOILERPLATE
+        if (getenv("DOCKER_DISABLE_DBOILERPLATE")) {
+            throw new \Exception(
+                "DOCKER_DISABLE_DBOILERPLATE is set,".
+                "delete the environment variable to use this class and configure the".
+                "database credentials manually in {$full_path}");
+        }
+
         // si no existe el archivo toml, se crea uno por defecto
         if (!file_exists($full_path)) {
             $toml_string = $this->getDefaultTomlStr();
