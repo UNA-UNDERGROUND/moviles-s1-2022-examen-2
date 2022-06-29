@@ -22,6 +22,7 @@ class BaseController extends MySqlConnectionProvider
 
     private function throwIfTableDoesNotExist(): void
     {
+        $conn = null;
         try {
             $sql = "SELECT * FROM $this->table";
             $conn = parent::getConnection();
@@ -34,7 +35,9 @@ class BaseController extends MySqlConnectionProvider
                 throw new Exception("Table $this->table does not exist");
             }
         } finally {
-            $conn->close();
+            if($conn != null) {
+                $conn->close();
+            }
         }
     }
 
