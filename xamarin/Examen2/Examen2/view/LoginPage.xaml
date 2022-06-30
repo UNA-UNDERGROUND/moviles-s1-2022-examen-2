@@ -13,7 +13,7 @@
                     <Entry x:Name="txtName"
                        HorizontalOptions="FillAndExpand"/>
                 </StackLayout>
-                <Button VerticalOptions="Center" Clicked="btnLoginClicked" 
+                <Button VerticalOptions="Center" Clicked="BtnLoginClicked" 
                     Text="Login"/>
             </StackLayout>
             

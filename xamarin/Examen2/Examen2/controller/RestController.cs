@@ -3,6 +3,8 @@ using System.Text;
 using System.Net;
 using System.Threading.Tasks;
 
+using System.Net.Http;
+
 namespace Examen2.controller
 {
     // this class is used to handle the REST calls
@@ -12,74 +14,168 @@ namespace Examen2.controller
     // and allow the following verbs: GET, POST, PUT, DELETE
     public class RestController
     {
-        public string verb { get; set; }
-        public string body { get; set; }
+        public string Verb { get; set; }
+        public string Body { get; set; }
 
-        public RestController(string verb, string body)
+        public string Url { get; set; }
+
+        private static readonly HttpClient client = new HttpClient();
+
+        public RestController(string url, string verb, string body)
         {
-            this.verb = verb;
-            this.body = body;
+            this.Url = url;
+            this.Verb = verb;
+            this.Body = body;
         }
 
         // async request to the server (async method [Response])
-        public async Task<Response> doRequest()
+        public async Task<Response> DoRequest()
         {
-            Response response = new Response();
+
             try
             {
-                // create the httpclient
-                var httpClient = new System.Net.Http.HttpClient();
-                // create the request
-                var request = new System.Net.Http.HttpRequestMessage();
-                // set the verb
-                request.Method = new System.Net.Http.HttpMethod(verb);
-                // set the body
-                if (body != null)
+                Response response = new Response();
+                // switch verb
+                HttpResponseMessage responseMessage = null;
+                switch (Verb)
                 {
-                    request.Content = new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json");
+                    // if get
+                    case "GET":
+                        // get response
+                        responseMessage = await client.GetAsync(Url);
+                        break;
+                    // if post
+                    case "POST":
+                        // get response
+                        responseMessage = await client.PostAsync(Url,
+                         new StringContent(Body, Encoding.UTF8, "application/json"));
+                        break;
+                    // if put
+                    case "PUT":
+                        // get response
+                        responseMessage = await client.PutAsync(Url, new StringContent(Body, Encoding.UTF8, "application/json"));
+                        break;
+                    // if delete
+                    case "DELETE":
+                        // get response
+                        responseMessage = await client.DeleteAsync(Url);
+                        break;
+
+                    default:
+                        throw new Exception("Invalid verb");
                 }
-                // send the request
-                var result = await httpClient.SendAsync(request);
-                // try to cast to a JSON string
-                var code = result.StatusCode;
-                var responseBody = await result.Content.ReadAsStringAsync();
+
+                //responseMessage = await client.SendAsync(request);
+                // get response
+                response.Body = await responseMessage.Content.ReadAsStringAsync();
+                // get status code
+                response.StatusCode = responseMessage.StatusCode;
+
+                // return response
+                return response;
+            }
+            catch (HttpRequestException e)
+            {
+                // log the exception
+                Console.WriteLine("\nException Caught!");
+                Console.WriteLine("Message :{0} ", e.Message);
+                return null;
+            }
+            catch (ArgumentNullException e)
+            {
+                // log the exception
+                Console.WriteLine("\nException Caught!");
+                Console.WriteLine("Message :{0} ", e.Message);
+                return null;
             }
             catch (Exception e)
             {
-                response.body = e.Message;
-                // cast to an integer to get the status code
-                response.statusCode = System.Net.HttpStatusCode.InternalServerError;
+                return new Response() { Body = e.Message, StatusCode = HttpStatusCode.InternalServerError };
             }
-            return response;
         }
 
 
         // static async methods for the different verbs
         // for get and delete, the body is not used
         // for post and put, the body is a JSON string
-        public static async Task<Response> get(string url)
+        public static async Task<Response> Get(string url)
         {
-            return await new RestController("GET", null).doRequest();
+            try
+            {
+                return await new RestController(url, "GET", "").DoRequest();
+            }
+            catch (Exception e)
+            {
+                Response response = new Response
+                {
+                    Body = e.Message,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError
+                };
+                return response;
+            }
         }
-        public static async Task<Response> post(string url, string body)
+        public static async Task<Response> Post(string url, string body)
         {
-            return await new RestController("POST", body).doRequest();
+            try
+            {
+                return await new RestController(url, "POST", body).DoRequest();
+
+            }
+            catch (Exception e)
+            {
+                Response response = new Response
+                {
+                    Body = e.Message,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError
+                };
+                return response;
+            }
         }
-        public static async Task<Response> put(string url, string body)
+        public static async Task<Response> Put(string url, string body)
         {
-            return await new RestController("PUT", body).doRequest();
+            try
+            {
+                return await new RestController(url, "PUT", body).DoRequest();
+            }
+            catch (Exception e)
+            {
+                Response response = new Response
+                {
+                    Body = e.Message,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError
+                };
+                return response;
+            }
         }
-        public static async Task<Response> delete(string url)
+        public static async Task<Response> Delete(string url)
         {
-            return await new RestController("DELETE", null).doRequest();
+            try
+            {
+                return await new RestController(url, "DELETE", "").DoRequest();
+            }
+            catch (Exception e)
+            {
+                Response response = new Response
+                {
+                    Body = e.Message,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError
+                };
+                return response;
+            }
         }
 
         // the response class
         // it contains the response body and the response code
         public class Response
         {
-            public string body { get; set; }
-            public HttpStatusCode statusCode { get; set; }
+            public string Body { get; set; }
+            public HttpStatusCode StatusCode { get; set; }
+
+            public Response()
+            {
+                Body = string.Empty;
+                StatusCode = HttpStatusCode.OK;
+            }
         }
     }
 }

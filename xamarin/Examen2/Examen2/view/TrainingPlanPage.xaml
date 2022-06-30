@@ -20,7 +20,7 @@
             <StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Label VerticalTextAlignment="Center">name</Label>
-                    <Entry x:Name="trainingPlanName"
+                    <Entry x:Name="txtTrainingPlanName"
                        HorizontalOptions="FillAndExpand"/>
                 </StackLayout>
             </StackLayout>

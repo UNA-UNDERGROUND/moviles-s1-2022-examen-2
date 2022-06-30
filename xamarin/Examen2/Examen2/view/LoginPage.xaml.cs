@@ -17,17 +17,18 @@ namespace Examen2.view
             InitializeComponent();
         }
 
-        private async void btnLoginClicked(object sender, EventArgs e)
+        private async void BtnLoginClicked(object sender, EventArgs e)
         {
             // check that name is not empty or null
-            if(string.IsNullOrEmpty(txtName.Text))
+            if (string.IsNullOrEmpty(txtName.Text))
             {
                 await DisplayAlert("Error", "Name is required", "OK");
                 txtName.Focus();
                 return;
             }
-            // show the TrainingPlanPage
-            await Navigation.PushModalAsync(new TrainingPlanPage());
+            TrainingPlanPage trainingPlanPage = new TrainingPlanPage(
+                new controller.TrainingPlanController(txtName.Text));
+            await Navigation.PushModalAsync(trainingPlanPage);
         }
     }
 }

@@ -24,14 +24,14 @@ namespace Examen2.controller
         // async get training plans
         public async Task<List<TrainingPlan>> getTrainingPlans()
         {
-            var response = await RestController.get(host + path);
+            var response = await RestController.Get(host + path);
             // switch response code
-            switch (response.statusCode)
+            switch (response.StatusCode)
             {
                 // if ok
                 case System.Net.HttpStatusCode.OK:
                     // get json
-                    var json = response.body;
+                    var json = response.Body;
                     // deserialize json
                     var trainingPlans = JsonConvert.DeserializeObject<List<TrainingPlan>>(json);
                     // return training plans
@@ -42,7 +42,7 @@ namespace Examen2.controller
                 // if error
                 default:
                     // log error
-                    Console.WriteLine("Error: " + response.statusCode);
+                    Console.WriteLine("Error: " + response.StatusCode);
                     // return null
                     return null;
             }
@@ -52,14 +52,14 @@ namespace Examen2.controller
         public async Task<TrainingPlan> addTrainingPlan(TrainingPlan trainingPlan)
         {
             var body = JsonConvert.SerializeObject(trainingPlan);
-            var response = await RestController.post(host + path, body);
+            var response = await RestController.Post(host + path, body);
             // switch response code
-            switch (response.statusCode)
+            switch (response.StatusCode)
             {
                 // if ok
                 case System.Net.HttpStatusCode.OK:
                     // get json
-                    var json = response.body;
+                    var json = response.Body;
                     // deserialize json
                     var trainingPlanResponse = JsonConvert.DeserializeObject<TrainingPlan>(json);
                     // return training plan
@@ -70,7 +70,7 @@ namespace Examen2.controller
                 // if error
                 default:
                     // log error
-                    Console.WriteLine("Error: " + response.statusCode);
+                    Console.WriteLine("Error: " + response.StatusCode);
                     // return null
                     return null;
             }
@@ -80,14 +80,14 @@ namespace Examen2.controller
         public async Task<TrainingPlan> updateTrainingPlan(TrainingPlan trainingPlan)
         {
             var body = JsonConvert.SerializeObject(trainingPlan);
-            var response = await RestController.put(host + path + trainingPlan.id, body);
+            var response = await RestController.Put(host + path + trainingPlan.id, body);
             // switch response code
-            switch (response.statusCode)
+            switch (response.StatusCode)
             {
                 // if ok
                 case System.Net.HttpStatusCode.OK:
                     // get json
-                    var json = response.body;
+                    var json = response.Body;
                     // deserialize json
                     var trainingPlanResponse = JsonConvert.DeserializeObject<TrainingPlan>(json);
                     // return training plan
@@ -98,7 +98,7 @@ namespace Examen2.controller
                 // if error
                 default:
                     // log error
-                    Console.WriteLine("Error: " + response.statusCode);
+                    Console.WriteLine("Error: " + response.StatusCode);
                     // return null
                     return null;
             }
@@ -107,21 +107,21 @@ namespace Examen2.controller
         // delete a training plan
         public async Task<bool> deleteTrainingPlan(TrainingPlan trainingPlan)
         {
-            var response = await RestController.delete(host + path + trainingPlan.id);
+            var response = await RestController.Delete(host + path + trainingPlan.id);
             // switch response code
-            switch (response.statusCode)
+            switch (response.StatusCode)
             {
                 // if ok
                 case System.Net.HttpStatusCode.OK:
                     // check for the response, is a boolean
-                    return JsonConvert.DeserializeObject<bool>(response.body);
+                    return JsonConvert.DeserializeObject<bool>(response.Body);
                 // if not found
                 case System.Net.HttpStatusCode.NotFound:
                     return false;
                 // if error
                 default:
                     // log error
-                    Console.WriteLine("Error: " + response.statusCode);
+                    Console.WriteLine("Error: " + response.StatusCode);
                     // return false
                     return false;
             }
