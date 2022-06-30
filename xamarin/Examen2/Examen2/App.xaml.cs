@@ -9,8 +9,16 @@ namespace Examen2
         public App()
         {
             InitializeComponent();
+            // catch all unhandled exceptions
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
             MainPage = new view.LoginPage();
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            // log error
+            Console.WriteLine("Error: " + e.ExceptionObject);
         }
 
         protected override void OnStart()

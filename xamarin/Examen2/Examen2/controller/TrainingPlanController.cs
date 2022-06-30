@@ -14,11 +14,11 @@ namespace Examen2.controller
         private static readonly string host = "https://examen2-moviles.xravn.net";
         private static readonly string path = "/api/trainingPlan/";
 
-        public string username { get; }
+        public string Username { get; }
 
         public TrainingPlanController(string username)
         {
-            this.username = username;
+            this.Username = username;
         }
 
         // async get training plans
